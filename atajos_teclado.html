@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Atajos de Teclado - AutoHotkey</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .search-container {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.1em;
+            border: 2px solid #e9ecef;
+            border-radius: 50px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .shortcuts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .shortcut-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border-left: 5px solid #667eea;
+        }
+
+        .shortcut-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .shortcut-card.web {
+            border-left-color: #e74c3c;
+        }
+
+        .shortcut-card.app {
+            border-left-color: #27ae60;
+        }
+
+        .shortcut-card.system {
+            border-left-color: #f39c12;
+        }
+
+        .shortcut-keys {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .key {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.9em;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .key.ctrl { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); }
+        .key.alt { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); }
+        .key.win { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); }
+
+        .shortcut-description {
+            font-size: 1.1em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .shortcut-url {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            word-break: break-all;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .category-web { background: #e74c3c; color: white; }
+        .category-app { background: #27ae60; color: white; }
+        .category-system { background: #f39c12; color: white; }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 50px;
+            color: #7f8c8d;
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 768px) {
+            .shortcuts-grid {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .filter-buttons {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎹 Mis Atajos de Teclado</h1>
+            <p>Accesos rápidos personalizados con AutoHotkey</p>
+        </div>
+
+        <div class="search-container">
+            <input type="text" class="search-box" id="searchBox" placeholder="🔍 Buscar atajos, sitios web o aplicaciones...">
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-category="all">Todos</button>
+                <button class="filter-btn" data-category="web">Sitios Web</button>
+                <button class="filter-btn" data-category="app">Aplicaciones</button>
+                <button class="filter-btn" data-category="system">Sistema</button>
+            </div>
+        </div>
+
+        <div class="shortcuts-grid" id="shortcutsGrid">
+            <!-- Los atajos se cargarán dinámicamente -->
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-number" id="totalShortcuts">0</div>
+                <div class="stat-label">Total Atajos</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="webShortcuts">0</div>
+                <div class="stat-label">Sitios Web</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="appShortcuts">0</div>
+                <div class="stat-label">Aplicaciones</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="systemShortcuts">0</div>
+                <div class="stat-label">Sistema</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const shortcuts = [
+            {
+                keys: ['Ctrl', 'Alt', '1'],
+                description: 'Abrir Google',
+                url: 'https://www.google.com/',
+                category: 'web'
+            },
+            {
+                keys: ['Ctrl', 'Alt', '2'],
+                description: 'Abrir YouTube',
+                url: 'https://www.youtube.com',
+                category: 'web'
+            },
+            {
+                keys: ['Win', 'Alt', 'J'],
+                description: 'Documentación LangChain',
+                url: 'https://python.langchain.com/docs',
+                category: 'web'
+            },
+            {
+                keys: ['Ctrl', 'Alt', 'V'],
+                description: 'Abrir ChatGPT',
+                url: 'https://www.chatgpt.com',
+                category: 'web'
+            },
+            {
+                keys: ['Ctrl', 'Alt', 'W'],
+                description: 'Abrir AI Google Studio',
+                url: 'https://www.aigoogle.studio.com',
+                category: 'web'
+            },
+            {
+                keys: ['Ctrl', 'Alt', 'E'],
+                description: 'Abrir Explain Shell',
+                url: 'https://www.explainshell.com',
+                category: 'web'
+            },
+            {
+                keys: ['Ctrl', 'Alt', 'R'],
+                description: 'Abrir Reddit',
+                url: 'https://www.reddit.com',
+                category: 'web'
+            },
+            {
+                keys: ['Ctrl', 'Alt', 'T'],
+                description: 'Abrir TikTok',
+                url: 'https://www.tiktok.com',
+                category: 'web'
+            },
+            {
+                keys: ['Ctrl', 'Alt', 'Y'],
+                description: 'Abrir YouTube',
+                url: 'https://www.youtube.com',
+                category: 'web'
+            },
+            {
+                keys: ['Ctrl', 'Alt', 'U'],
+                description: 'Abrir Twitter',
+                url: 'https://www.twitter.com',
+                category: 'web'
+            },
+            {
+                keys: ['Ctrl', 'Alt', 'I'],
+                description: 'Abrir Instagram',
+                url: 'https://www.instagram.com',
+                category: 'web'
+            },
+            {
+                keys: ['Ctrl', 'Alt', 'O'],
+                description: 'Abrir LinkedIn',
+                url: 'https://www.linkedin.com',
+                category: 'web'
+            },
+            {
+                keys: ['Ctrl', 'Alt', 'P'],
+                description: 'Abrir Pinterest',
+                url: 'https://www.pinterest.com',
+                category: 'web'
+            },
+            {
+                keys: ['Ctrl', 'Alt', 'Q'],
+                description: 'Abrir Quora',
+                url: 'https://www.quora.com',
+                category: 'web'
+            },
+            {
+                keys: ['Ctrl', 'Alt', 'S'],
+                description: 'Abrir Stack Overflow',
+                url: 'https://www.stackoverflow.com',
+                category: 'web'
+            },
+            {
+                keys: ['Ctrl', 'Alt', 'A'],
+                description: 'Abrir Amazon',
+                url: 'https://www.amazon.com',
+                category: 'web'
+            },
+            {
+                keys: ['Ctrl', 'Alt', 'D'],
+                description: 'Abrir Dev.to',
+                url: 'https://www.dev.to',
+                category: 'web'
+            },
+            {
+                keys: ['Ctrl', 'Alt', 'F'],
+                description: 'Abrir Facebook',
+                url: 'https://www.facebook.com',
+                category: 'web'
+            },
+            {
+                keys: ['Ctrl', 'Alt', 'G'],
+                description: 'Abrir GitHub',
+                url: 'https://www.github.com',
+                category: 'web'
+            },
+            {
+                keys: ['Win', 'J'],
+                description: 'Abrir Warp Terminal',
+                url: 'C:\\Users\\J.J. R\\AppData\\Local\\Programs\\Warp\\warp.exe',
+                category: 'app'
+            },
+            {
+                keys: ['Ctrl', 'Alt', 'C'],
+                description: 'Abrir ChatGPT en Chrome',
+                url: 'Chrome con ChatGPT',
+                category: 'app'
+            },
+            {
+                keys: ['Ctrl', 'Alt', 'J'],
+                description: 'Abrir Cursor en Startup',
+                url: 'Cursor en directorio Startup',
+                category: 'app'
+            },
+            {
+                keys: ['Win', 'Alt', 'R'],
+                description: 'Recargar Script',
+                url: 'Recargar AutoHotkey',
+                category: 'system'
+            },
+            {
+                keys: ['Ctrl', 'Esc'],
+                description: 'Cerrar Script',
+                url: 'Salir de AutoHotkey',
+                category: 'system'
+            }
+        ];
+
+        let filteredShortcuts = [...shortcuts];
+        let currentCategory = 'all';
+
+        function renderShortcuts() {
+            const grid = document.getElementById('shortcutsGrid');
+            
+            if (filteredShortcuts.length === 0) {
+                grid.innerHTML = '<div class="no-results">🔍 No se encontraron atajos que coincidan con tu búsqueda</div>';
+                return;
+            }
+
+            grid.innerHTML = filteredShortcuts.map(shortcut => `
+                <div class="shortcut-card ${shortcut.category}">
+                    <div class="category-badge category-${shortcut.category}">
+                        ${shortcut.category === 'web' ? '🌐 Web' : 
+                          shortcut.category === 'app' ? '💻 App' : '⚙️ Sistema'}
+                    </div>
+                    <div class="shortcut-keys">
+                        ${shortcut.keys.map(key => `<span class="key ${key.toLowerCase()}">${key}</span>`).join('')}
+                    </div>
+                    <div class="shortcut-description">${shortcut.description}</div>
+                    <div class="shortcut-url">${shortcut.url}</div>
+                </div>
+            `).join('');
+        }
+
+        function updateStats() {
+            const total = shortcuts.length;
+            const web = shortcuts.filter(s => s.category === 'web').length;
+            const app = shortcuts.filter(s => s.category === 'app').length;
+            const system = shortcuts.filter(s => s.category === 'system').length;
+
+            document.getElementById('totalShortcuts').textContent = total;
+            document.getElementById('webShortcuts').textContent = web;
+            document.getElementById('appShortcuts').textContent = app;
+            document.getElementById('systemShortcuts').textContent = system;
+        }
+
+        function filterShortcuts() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            
+            filteredShortcuts = shortcuts.filter(shortcut => {
+                const matchesSearch = shortcut.description.toLowerCase().includes(searchTerm) ||
+                                    shortcut.url.toLowerCase().includes(searchTerm) ||
+                                    shortcut.keys.some(key => key.toLowerCase().includes(searchTerm));
+                
+                const matchesCategory = currentCategory === 'all' || shortcut.category === currentCategory;
+                
+                return matchesSearch && matchesCategory;
+            });
+            
+            renderShortcuts();
+        }
+
+        // Event listeners
+        document.getElementById('searchBox').addEventListener('input', filterShortcuts);
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentCategory = btn.dataset.category;
+                filterShortcuts();
+            });
+        });
+
+        // Inicializar
+        renderShortcuts();
+        updateStats();
+
+        // Efecto de teclas al hacer clic
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('key')) {
+                e.target.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    e.target.style.transform = 'scale(1)';
+                }, 150);
+            }
+        });
+
+        // Atajo de teclado para búsqueda rápida
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'f') {
+                e.preventDefault();
+                document.getElementById('searchBox').focus();
+            }
+        });
+    </script>
+</body>
+</html>
