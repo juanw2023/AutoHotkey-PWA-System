@@ -17,7 +17,6 @@
 ^!i::Run("https://www.instagram.com")
 ^!o::Run("https://www.linkedin.com")
 ^!p::Run("https://www.pinterest.com")
-^!q::Run("https://www.quora.com")
 ^!s::Run("https://www.stackoverflow.com")
 ^!a::Run("https://www.amazon.com")
 ^!d::Run("https://www.dev.to")

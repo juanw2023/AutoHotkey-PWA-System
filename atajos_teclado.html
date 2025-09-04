@@ -4,7 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mis Atajos de Teclado - AutoHotkey</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="application-name" content="Atajos">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Atajos">
+    <meta name="description" content="Gestor de atajos de teclado con AutoHotkey">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="msapplication-config" content="browserconfig.xml">
+    <meta name="msapplication-TileColor" content="#667eea">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="theme-color" content="#667eea">
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="icons/icon-192x192.png">
+    
+    <!-- Standard Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16x16.png">
+    <link rel="shortcut icon" href="icons/icon-192x192.png">
     <style>
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --bg-tertiary: #3a3a3a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --text-muted: #808080;
+            --accent-primary: #667eea;
+            --accent-secondary: #764ba2;
+            --border-color: #404040;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --gradient-bg: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            --gradient-accent: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #e9ecef;
+            --text-primary: #2c3e50;
+            --text-secondary: #495057;
+            --text-muted: #6c757d;
+            --accent-primary: #667eea;
+            --accent-secondary: #764ba2;
+            --border-color: #dee2e6;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --gradient-bg: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            --gradient-accent: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,25 +68,49 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--gradient-bg);
             min-height: 100vh;
             padding: 20px;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--bg-primary);
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 40px var(--shadow);
             overflow: hidden;
+            border: 1px solid var(--border-color);
         }
 
         .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            background: var(--gradient-accent);
             color: white;
             padding: 30px;
             text-align: center;
+            position: relative;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
         }
 
         .header h1 {
@@ -45,39 +124,78 @@
             opacity: 0.9;
         }
 
-        .search-container {
+        .controls-container {
             padding: 30px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
         }
 
         .search-box {
             width: 100%;
             padding: 15px 20px;
             font-size: 1.1em;
-            border: 2px solid #e9ecef;
+            border: 2px solid var(--border-color);
             border-radius: 50px;
             outline: none;
             transition: all 0.3s ease;
+            background: var(--bg-primary);
+            color: var(--text-primary);
         }
 
         .search-box:focus {
-            border-color: #667eea;
+            border-color: var(--accent-primary);
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .filter-buttons {
             display: flex;
             gap: 10px;
-            margin-top: 20px;
             flex-wrap: wrap;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 5px;
+            background: var(--bg-tertiary);
+            border-radius: 25px;
+            padding: 5px;
+            border: 1px solid var(--border-color);
+        }
+
+        .view-btn {
+            padding: 8px 12px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+        }
+
+        .view-btn.active {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .view-btn:hover {
+            color: var(--text-primary);
         }
 
         .filter-btn {
             padding: 8px 16px;
-            border: 2px solid #667eea;
-            background: white;
-            color: #667eea;
+            border: 2px solid var(--accent-primary);
+            background: var(--bg-primary);
+            color: var(--accent-primary);
             border-radius: 25px;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -86,8 +204,110 @@
 
         .filter-btn.active,
         .filter-btn:hover {
-            background: #667eea;
+            background: var(--accent-primary);
             color: white;
+        }
+
+        .add-shortcut-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--bg-tertiary);
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+        }
+
+        .add-shortcut-title {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 5px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+
+        .keys-input {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .key-input {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            outline: none;
+            min-width: 80px;
+        }
+
+        .add-key-btn {
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .add-key-btn:hover {
+            background: var(--accent-secondary);
+        }
+
+        .add-shortcut-btn {
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .add-shortcut-btn:hover {
+            background: var(--accent-secondary);
+            transform: translateY(-2px);
         }
 
         .shortcuts-grid {
@@ -97,18 +317,135 @@
             padding: 30px;
         }
 
+        .shortcuts-list {
+            padding: 20px;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .list-item:hover {
+            background: var(--bg-tertiary);
+            transform: translateX(5px);
+        }
+
+        .list-item.web {
+            border-left: 4px solid #e74c3c;
+        }
+
+        .list-item.app {
+            border-left: 4px solid #27ae60;
+        }
+
+        .list-item.system {
+            border-left: 4px solid #f39c12;
+        }
+
+        .list-item.custom {
+            border-left: 4px solid #9b59b6;
+        }
+
+        .list-category {
+            min-width: 80px;
+            text-align: center;
+            margin-right: 20px;
+        }
+
+        .list-category-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .list-keys {
+            display: flex;
+            gap: 5px;
+            margin-right: 20px;
+            min-width: 150px;
+        }
+
+        .list-key {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.8em;
+            box-shadow: 0 1px 3px var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .list-key.ctrl { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; }
+        .list-key.alt { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); color: white; }
+        .list-key.win { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; }
+        .list-key.shift { background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); color: white; }
+
+        .list-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .list-description {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .list-url {
+            font-size: 0.9em;
+            color: var(--text-muted);
+            word-break: break-all;
+        }
+
+        .list-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .list-delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .list-delete-btn:hover {
+            opacity: 1;
+            background: #c0392b;
+        }
+
         .shortcut-card {
-            background: white;
+            background: var(--bg-secondary);
             border-radius: 15px;
             padding: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 5px 15px var(--shadow);
             transition: all 0.3s ease;
-            border-left: 5px solid #667eea;
+            border-left: 5px solid var(--accent-primary);
+            border: 1px solid var(--border-color);
         }
 
         .shortcut-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 15px 30px var(--shadow);
         }
 
         .shortcut-card.web {
@@ -123,6 +460,10 @@
             border-left-color: #f39c12;
         }
 
+        .shortcut-card.custom {
+            border-left-color: #9b59b6;
+        }
+
         .shortcut-keys {
             display: flex;
             gap: 5px;
@@ -131,28 +472,30 @@
         }
 
         .key {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            color: white;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
             padding: 8px 12px;
             border-radius: 8px;
             font-weight: bold;
             font-size: 0.9em;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 4px var(--shadow);
+            border: 1px solid var(--border-color);
         }
 
-        .key.ctrl { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); }
-        .key.alt { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); }
-        .key.win { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); }
+        .key.ctrl { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; }
+        .key.alt { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); color: white; }
+        .key.win { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; }
+        .key.shift { background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); color: white; }
 
         .shortcut-description {
             font-size: 1.1em;
-            color: #2c3e50;
+            color: var(--text-primary);
             margin-bottom: 10px;
             font-weight: 500;
         }
 
         .shortcut-url {
-            color: #7f8c8d;
+            color: var(--text-muted);
             font-size: 0.9em;
             word-break: break-all;
         }
@@ -170,13 +513,32 @@
         .category-web { background: #e74c3c; color: white; }
         .category-app { background: #27ae60; color: white; }
         .category-system { background: #f39c12; color: white; }
+        .category-custom { background: #9b59b6; color: white; }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+            margin-top: 10px;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            opacity: 1;
+            background: #c0392b;
+        }
 
         .stats {
             display: flex;
             justify-content: space-around;
             padding: 20px;
-            background: #f8f9fa;
-            border-top: 1px solid #e9ecef;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
         }
 
         .stat {
@@ -186,19 +548,43 @@
         .stat-number {
             font-size: 2em;
             font-weight: bold;
-            color: #667eea;
+            color: var(--accent-primary);
         }
 
         .stat-label {
-            color: #7f8c8d;
+            color: var(--text-muted);
             font-size: 0.9em;
         }
 
         .no-results {
             text-align: center;
             padding: 50px;
-            color: #7f8c8d;
+            color: var(--text-muted);
             font-size: 1.2em;
+        }
+
+        .toggle-add-form {
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .toggle-add-form:hover {
+            background: var(--accent-secondary);
+        }
+
+        .add-form {
+            display: none;
+        }
+
+        .add-form.show {
+            display: block;
         }
 
         @media (max-width: 768px) {
@@ -214,28 +600,84 @@
             .filter-buttons {
                 justify-content: center;
             }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
+            <button class="theme-toggle" id="themeToggle">🌙</button>
             <h1>🎹 Mis Atajos de Teclado</h1>
             <p>Accesos rápidos personalizados con AutoHotkey</p>
         </div>
 
-        <div class="search-container">
+        <div class="controls-container">
             <input type="text" class="search-box" id="searchBox" placeholder="🔍 Buscar atajos, sitios web o aplicaciones...">
-            <div class="filter-buttons">
-                <button class="filter-btn active" data-category="all">Todos</button>
-                <button class="filter-btn" data-category="web">Sitios Web</button>
-                <button class="filter-btn" data-category="app">Aplicaciones</button>
-                <button class="filter-btn" data-category="system">Sistema</button>
+            <div class="controls-row">
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-category="all">Todos</button>
+                    <button class="filter-btn" data-category="web">Sitios Web</button>
+                    <button class="filter-btn" data-category="app">Aplicaciones</button>
+                    <button class="filter-btn" data-category="system">Sistema</button>
+                    <button class="filter-btn" data-category="custom">Personalizados</button>
+                </div>
+                <div class="view-toggle">
+                    <button class="view-btn active" data-view="list" title="Vista de Lista">📋</button>
+                    <button class="view-btn" data-view="cards" title="Vista de Tarjetas">🃏</button>
+                </div>
+            </div>
+
+            <div class="add-shortcut-section">
+                <button class="toggle-add-form" id="toggleAddForm">➕ Agregar Nuevo Atajo</button>
+                <div class="add-form" id="addForm">
+                    <div class="add-shortcut-title">🎯 Crear Nuevo Atajo</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Descripción:</label>
+                            <input type="text" id="descriptionInput" placeholder="Ej: Abrir Spotify">
+                        </div>
+                        <div class="form-group">
+                            <label>URL/Comando:</label>
+                            <input type="text" id="urlInput" placeholder="https://spotify.com o comando">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Categoría:</label>
+                            <select id="categoryInput">
+                                <option value="web">🌐 Sitio Web</option>
+                                <option value="app">💻 Aplicación</option>
+                                <option value="system">⚙️ Sistema</option>
+                                <option value="custom">🎨 Personalizado</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Teclas (separadas por comas):</label>
+                            <div class="keys-input">
+                                <input type="text" id="keysInput" placeholder="Ctrl, Alt, S" class="key-input">
+                                <button class="add-key-btn" id="addKeyBtn">Agregar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="add-shortcut-btn" id="addShortcutBtn">✨ Crear Atajo</button>
+                </div>
             </div>
         </div>
 
         <div class="shortcuts-grid" id="shortcutsGrid">
             <!-- Los atajos se cargarán dinámicamente -->
+        </div>
+        <div class="shortcuts-list" id="shortcutsList" style="display: none;">
+            <!-- Los atajos en vista de lista se cargarán dinámicamente -->
         </div>
 
         <div class="stats">
@@ -255,159 +697,270 @@
                 <div class="stat-number" id="systemShortcuts">0</div>
                 <div class="stat-label">Sistema</div>
             </div>
+            <div class="stat">
+                <div class="stat-number" id="customShortcuts">0</div>
+                <div class="stat-label">Personalizados</div>
+            </div>
         </div>
     </div>
 
     <script>
-        const shortcuts = [
+        // Atajos por defecto
+        const defaultShortcuts = [
             {
                 keys: ['Ctrl', 'Alt', '1'],
                 description: 'Abrir Google',
                 url: 'https://www.google.com/',
-                category: 'web'
+                category: 'web',
+                custom: false
             },
             {
                 keys: ['Ctrl', 'Alt', '2'],
                 description: 'Abrir YouTube',
                 url: 'https://www.youtube.com',
-                category: 'web'
+                category: 'web',
+                custom: false
             },
             {
                 keys: ['Win', 'Alt', 'J'],
                 description: 'Documentación LangChain',
                 url: 'https://python.langchain.com/docs',
-                category: 'web'
+                category: 'web',
+                custom: false
             },
             {
                 keys: ['Ctrl', 'Alt', 'V'],
                 description: 'Abrir ChatGPT',
                 url: 'https://www.chatgpt.com',
-                category: 'web'
+                category: 'web',
+                custom: false
             },
             {
                 keys: ['Ctrl', 'Alt', 'W'],
                 description: 'Abrir AI Google Studio',
                 url: 'https://www.aigoogle.studio.com',
-                category: 'web'
+                category: 'web',
+                custom: false
             },
             {
                 keys: ['Ctrl', 'Alt', 'E'],
                 description: 'Abrir Explain Shell',
                 url: 'https://www.explainshell.com',
-                category: 'web'
+                category: 'web',
+                custom: false
             },
             {
                 keys: ['Ctrl', 'Alt', 'R'],
                 description: 'Abrir Reddit',
                 url: 'https://www.reddit.com',
-                category: 'web'
+                category: 'web',
+                custom: false
             },
             {
                 keys: ['Ctrl', 'Alt', 'T'],
                 description: 'Abrir TikTok',
                 url: 'https://www.tiktok.com',
-                category: 'web'
+                category: 'web',
+                custom: false
             },
             {
                 keys: ['Ctrl', 'Alt', 'Y'],
                 description: 'Abrir YouTube',
                 url: 'https://www.youtube.com',
-                category: 'web'
+                category: 'web',
+                custom: false
             },
             {
                 keys: ['Ctrl', 'Alt', 'U'],
                 description: 'Abrir Twitter',
                 url: 'https://www.twitter.com',
-                category: 'web'
+                category: 'web',
+                custom: false
             },
             {
                 keys: ['Ctrl', 'Alt', 'I'],
                 description: 'Abrir Instagram',
                 url: 'https://www.instagram.com',
-                category: 'web'
+                category: 'web',
+                custom: false
             },
             {
                 keys: ['Ctrl', 'Alt', 'O'],
                 description: 'Abrir LinkedIn',
                 url: 'https://www.linkedin.com',
-                category: 'web'
+                category: 'web',
+                custom: false
             },
             {
                 keys: ['Ctrl', 'Alt', 'P'],
                 description: 'Abrir Pinterest',
                 url: 'https://www.pinterest.com',
-                category: 'web'
+                category: 'web',
+                custom: false
             },
             {
                 keys: ['Ctrl', 'Alt', 'Q'],
                 description: 'Abrir Quora',
                 url: 'https://www.quora.com',
-                category: 'web'
+                category: 'web',
+                custom: false
             },
             {
                 keys: ['Ctrl', 'Alt', 'S'],
                 description: 'Abrir Stack Overflow',
                 url: 'https://www.stackoverflow.com',
-                category: 'web'
+                category: 'web',
+                custom: false
             },
             {
                 keys: ['Ctrl', 'Alt', 'A'],
                 description: 'Abrir Amazon',
                 url: 'https://www.amazon.com',
-                category: 'web'
+                category: 'web',
+                custom: false
             },
             {
                 keys: ['Ctrl', 'Alt', 'D'],
                 description: 'Abrir Dev.to',
                 url: 'https://www.dev.to',
-                category: 'web'
+                category: 'web',
+                custom: false
             },
             {
                 keys: ['Ctrl', 'Alt', 'F'],
                 description: 'Abrir Facebook',
                 url: 'https://www.facebook.com',
-                category: 'web'
+                category: 'web',
+                custom: false
             },
             {
                 keys: ['Ctrl', 'Alt', 'G'],
                 description: 'Abrir GitHub',
                 url: 'https://www.github.com',
-                category: 'web'
+                category: 'web',
+                custom: false
             },
             {
                 keys: ['Win', 'J'],
                 description: 'Abrir Warp Terminal',
                 url: 'C:\\Users\\J.J. R\\AppData\\Local\\Programs\\Warp\\warp.exe',
-                category: 'app'
+                category: 'app',
+                custom: false
             },
             {
                 keys: ['Ctrl', 'Alt', 'C'],
                 description: 'Abrir ChatGPT en Chrome',
                 url: 'Chrome con ChatGPT',
-                category: 'app'
+                category: 'app',
+                custom: false
             },
             {
                 keys: ['Ctrl', 'Alt', 'J'],
                 description: 'Abrir Cursor en Startup',
                 url: 'Cursor en directorio Startup',
-                category: 'app'
+                category: 'app',
+                custom: false
             },
             {
                 keys: ['Win', 'Alt', 'R'],
                 description: 'Recargar Script',
                 url: 'Recargar AutoHotkey',
-                category: 'system'
+                category: 'system',
+                custom: false
             },
             {
                 keys: ['Ctrl', 'Esc'],
                 description: 'Cerrar Script',
                 url: 'Salir de AutoHotkey',
-                category: 'system'
+                category: 'system',
+                custom: false
             }
         ];
 
+        let shortcuts = [...defaultShortcuts];
         let filteredShortcuts = [...shortcuts];
         let currentCategory = 'all';
+        let currentTheme = 'dark';
+        let currentView = 'list';
+
+        // Cargar datos del localStorage
+        function loadShortcuts() {
+            const saved = localStorage.getItem('customShortcuts');
+            if (saved) {
+                const customShortcuts = JSON.parse(saved);
+                shortcuts = [...defaultShortcuts, ...customShortcuts];
+            }
+        }
+
+        // Guardar atajos personalizados
+        function saveShortcuts() {
+            const customShortcuts = shortcuts.filter(s => s.custom);
+            localStorage.setItem('customShortcuts', JSON.stringify(customShortcuts));
+        }
+
+        // Cargar tema
+        function loadTheme() {
+            const saved = localStorage.getItem('theme');
+            if (saved) {
+                currentTheme = saved;
+                document.documentElement.setAttribute('data-theme', currentTheme);
+                updateThemeToggle();
+            }
+        }
+
+        // Cargar vista
+        function loadView() {
+            const saved = localStorage.getItem('view');
+            if (saved) {
+                currentView = saved;
+                updateViewToggle();
+                switchView(currentView);
+            }
+        }
+
+        // Actualizar botón de tema
+        function updateThemeToggle() {
+            const toggle = document.getElementById('themeToggle');
+            toggle.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // Actualizar botones de vista
+        function updateViewToggle() {
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.view === currentView) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        // Cambiar vista
+        function switchView(view) {
+            currentView = view;
+            localStorage.setItem('view', view);
+            updateViewToggle();
+            
+            const grid = document.getElementById('shortcutsGrid');
+            const list = document.getElementById('shortcutsList');
+            
+            if (view === 'list') {
+                grid.style.display = 'none';
+                list.style.display = 'block';
+                renderListView();
+            } else {
+                grid.style.display = 'grid';
+                list.style.display = 'none';
+                renderShortcuts();
+            }
+        }
+
+        // Cambiar tema
+        function toggleTheme() {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            localStorage.setItem('theme', currentTheme);
+            updateThemeToggle();
+        }
 
         function renderShortcuts() {
             const grid = document.getElementById('shortcutsGrid');
@@ -417,17 +970,50 @@
                 return;
             }
 
-            grid.innerHTML = filteredShortcuts.map(shortcut => `
+            grid.innerHTML = filteredShortcuts.map((shortcut, index) => `
                 <div class="shortcut-card ${shortcut.category}">
                     <div class="category-badge category-${shortcut.category}">
                         ${shortcut.category === 'web' ? '🌐 Web' : 
-                          shortcut.category === 'app' ? '💻 App' : '⚙️ Sistema'}
+                          shortcut.category === 'app' ? '💻 App' : 
+                          shortcut.category === 'system' ? '⚙️ Sistema' : '🎨 Personalizado'}
                     </div>
                     <div class="shortcut-keys">
                         ${shortcut.keys.map(key => `<span class="key ${key.toLowerCase()}">${key}</span>`).join('')}
                     </div>
                     <div class="shortcut-description">${shortcut.description}</div>
                     <div class="shortcut-url">${shortcut.url}</div>
+                    ${shortcut.custom ? `<button class="delete-btn" onclick="deleteShortcut(${index})">🗑️ Eliminar</button>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function renderListView() {
+            const list = document.getElementById('shortcutsList');
+            
+            if (filteredShortcuts.length === 0) {
+                list.innerHTML = '<div class="no-results">🔍 No se encontraron atajos que coincidan con tu búsqueda</div>';
+                return;
+            }
+
+            list.innerHTML = filteredShortcuts.map((shortcut, index) => `
+                <div class="list-item ${shortcut.category}" onclick="copyToClipboard('${shortcut.url}')">
+                    <div class="list-category">
+                        <div class="list-category-badge category-${shortcut.category}">
+                            ${shortcut.category === 'web' ? '🌐' : 
+                              shortcut.category === 'app' ? '💻' : 
+                              shortcut.category === 'system' ? '⚙️' : '🎨'}
+                        </div>
+                    </div>
+                    <div class="list-keys">
+                        ${shortcut.keys.map(key => `<span class="list-key ${key.toLowerCase()}">${key}</span>`).join('')}
+                    </div>
+                    <div class="list-content">
+                        <div class="list-description">${shortcut.description}</div>
+                        <div class="list-url">${shortcut.url}</div>
+                    </div>
+                    <div class="list-actions">
+                        ${shortcut.custom ? `<button class="list-delete-btn" onclick="event.stopPropagation(); deleteShortcut(${index})">🗑️</button>` : ''}
+                    </div>
                 </div>
             `).join('');
         }
@@ -437,11 +1023,13 @@
             const web = shortcuts.filter(s => s.category === 'web').length;
             const app = shortcuts.filter(s => s.category === 'app').length;
             const system = shortcuts.filter(s => s.category === 'system').length;
+            const custom = shortcuts.filter(s => s.category === 'custom').length;
 
             document.getElementById('totalShortcuts').textContent = total;
             document.getElementById('webShortcuts').textContent = web;
             document.getElementById('appShortcuts').textContent = app;
             document.getElementById('systemShortcuts').textContent = system;
+            document.getElementById('customShortcuts').textContent = custom;
         }
 
         function filterShortcuts() {
@@ -457,7 +1045,101 @@
                 return matchesSearch && matchesCategory;
             });
             
-            renderShortcuts();
+            if (currentView === 'list') {
+                renderListView();
+            } else {
+                renderShortcuts();
+            }
+        }
+
+        function addShortcut() {
+            const description = document.getElementById('descriptionInput').value.trim();
+            const url = document.getElementById('urlInput').value.trim();
+            const category = document.getElementById('categoryInput').value;
+            const keysText = document.getElementById('keysInput').value.trim();
+
+            if (!description || !url || !keysText) {
+                alert('Por favor completa todos los campos');
+                return;
+            }
+
+            const keys = keysText.split(',').map(key => key.trim()).filter(key => key);
+            
+            if (keys.length === 0) {
+                alert('Por favor ingresa al menos una tecla');
+                return;
+            }
+
+            const newShortcut = {
+                keys: keys,
+                description: description,
+                url: url,
+                category: category,
+                custom: true
+            };
+
+            shortcuts.push(newShortcut);
+            saveShortcuts();
+            filterShortcuts();
+            updateStats();
+
+            // Limpiar formulario
+            document.getElementById('descriptionInput').value = '';
+            document.getElementById('urlInput').value = '';
+            document.getElementById('keysInput').value = '';
+            document.getElementById('categoryInput').value = 'web';
+
+            // Ocultar formulario
+            document.getElementById('addForm').classList.remove('show');
+        }
+
+        function deleteShortcut(index) {
+            if (confirm('¿Estás seguro de que quieres eliminar este atajo?')) {
+                const shortcutToDelete = filteredShortcuts[index];
+                const realIndex = shortcuts.findIndex(s => 
+                    s.description === shortcutToDelete.description && 
+                    s.url === shortcutToDelete.url && 
+                    s.custom === true
+                );
+                
+                if (realIndex !== -1) {
+                    shortcuts.splice(realIndex, 1);
+                    saveShortcuts();
+                    filterShortcuts();
+                    updateStats();
+                }
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Mostrar feedback visual
+                const event = new CustomEvent('showToast', { 
+                    detail: { message: 'URL copiada al portapapeles', type: 'success' } 
+                });
+                document.dispatchEvent(event);
+            }).catch(() => {
+                // Fallback para navegadores que no soportan clipboard API
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+            });
+        }
+
+        function toggleAddForm() {
+            const form = document.getElementById('addForm');
+            const button = document.getElementById('toggleAddForm');
+            
+            if (form.classList.contains('show')) {
+                form.classList.remove('show');
+                button.textContent = '➕ Agregar Nuevo Atajo';
+            } else {
+                form.classList.add('show');
+                button.textContent = '❌ Cancelar';
+            }
         }
 
         // Event listeners
@@ -472,8 +1154,81 @@
             });
         });
 
+        document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+        document.getElementById('toggleAddForm').addEventListener('click', toggleAddForm);
+        document.getElementById('addShortcutBtn').addEventListener('click', addShortcut);
+
+        // Event listeners para cambio de vista
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                switchView(btn.dataset.view);
+            });
+        });
+
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+
+        // PWA Install Prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            // Mostrar botón de instalación si es necesario
+            showInstallButton();
+        });
+
+        function showInstallButton() {
+            // Crear botón de instalación si no existe
+            if (!document.getElementById('installBtn')) {
+                const installBtn = document.createElement('button');
+                installBtn.id = 'installBtn';
+                installBtn.innerHTML = '📱 Instalar App';
+                installBtn.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 80px;
+                    background: var(--accent-primary);
+                    color: white;
+                    border: none;
+                    padding: 10px 15px;
+                    border-radius: 20px;
+                    cursor: pointer;
+                    font-size: 0.9em;
+                    z-index: 1000;
+                    transition: all 0.3s ease;
+                `;
+                installBtn.addEventListener('click', installApp);
+                document.body.appendChild(installBtn);
+            }
+        }
+
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('Usuario aceptó la instalación');
+                    }
+                    deferredPrompt = null;
+                    document.getElementById('installBtn').remove();
+                });
+            }
+        }
+
         // Inicializar
-        renderShortcuts();
+        loadShortcuts();
+        loadTheme();
+        loadView();
         updateStats();
 
         // Efecto de teclas al hacer clic

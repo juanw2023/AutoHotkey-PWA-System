@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generador de Iconos para PWA</title>
+</head>
+<body>
+    <canvas id="canvas" width="512" height="512" style="border: 1px solid #ccc;"></canvas>
+    <br><br>
+    <button onclick="generateIcons()">Generar Iconos</button>
+    <div id="downloads"></div>
+
+    <script>
+        function generateIcons() {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            const downloads = document.getElementById('downloads');
+            
+            // Limpiar canvas
+            ctx.clearRect(0, 0, 512, 512);
+            
+            // Fondo
+            const gradient = ctx.createLinearGradient(0, 0, 512, 512);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 512, 512);
+            
+            // Icono de teclado
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 200px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('⌨️', 256, 256);
+            
+            // Generar diferentes tamaños
+            const sizes = [16, 32, 72, 96, 128, 144, 152, 192, 384, 512];
+            
+            sizes.forEach(size => {
+                const newCanvas = document.createElement('canvas');
+                newCanvas.width = size;
+                newCanvas.height = size;
+                const newCtx = newCanvas.getContext('2d');
+                
+                // Dibujar en el nuevo canvas
+                const newGradient = newCtx.createLinearGradient(0, 0, size, size);
+                newGradient.addColorStop(0, '#667eea');
+                newGradient.addColorStop(1, '#764ba2');
+                newCtx.fillStyle = newGradient;
+                newCtx.fillRect(0, 0, size, size);
+                
+                newCtx.fillStyle = 'white';
+                newCtx.font = `bold ${size * 0.4}px Arial`;
+                newCtx.textAlign = 'center';
+                newCtx.textBaseline = 'middle';
+                newCtx.fillText('⌨️', size/2, size/2);
+                
+                // Crear enlace de descarga
+                const link = document.createElement('a');
+                link.download = `icon-${size}x${size}.png`;
+                link.href = newCanvas.toDataURL();
+                link.textContent = `Descargar ${size}x${size}`;
+                link.style.display = 'block';
+                link.style.margin = '5px 0';
+                downloads.appendChild(link);
+            });
+        }
+    </script>
+</body>
+</html>
