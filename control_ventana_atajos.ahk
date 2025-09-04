@@ -17,18 +17,29 @@ atajosProcessPath := ""
 ; CONFIGURACIÓN DE ATAJOS DE TECLADO
 ; ========================================
 
-; Atajo principal para mostrar/ocultar ventana de atajos
+; Atajo principal para mostrar/ocultar ventana de atajos (PWA)
 ; Usa Win+Alt+Space (evita conflicto con ChatGPT)
-#!Space::ToggleAtajosWindow()
+#Space::TogglePWA("", "Atajos")
 
 ; Atajo alternativo con Win+Alt+A
 #!a::ToggleAtajosWindow()
 
-; Atajo para abrir la aplicación de Edge específica
-^!#e::OpenEdgeApp()
+; ========================================
+; ATAJOS INDIVIDUALES PARA PWAs
+; ========================================
+; Cada PWA tiene su propio atajo específico
 
-; Atajo para abrir la PWA de atajos si no está abierta
-^!h::OpenAtajosPWA()
+; PWA de Atajos
+^!h::TogglePWA("", "Atajos")
+
+; PWA de xAI (tu app Edge)
+^!#e::TogglePWA("hambcbdmoijfllbddakfglefcahfejcl", "xAI")
+
+
+; Ejemplos de más PWAs (descomenta y ajusta según necesites):
+; ^!s::TogglePWA("spotify_id", "Spotify")
+; ^!d::TogglePWA("discord_id", "Discord")
+; ^!t::TogglePWA("twitter_id", "Twitter")
 
 ; ========================================
 ; FUNCIONES PRINCIPALES
@@ -40,7 +51,7 @@ ToggleAtajosWindow() {
     ; Buscar la ventana de atajos
     if (!FindAtajosWindow()) {
         ; Si no se encuentra, abrir la PWA
-        OpenAtajosPWA()
+        TogglePWA("", "Atajos")
         Sleep(2000)  ; Esperar a que se abra
         FindAtajosWindow()
     }
@@ -55,6 +66,93 @@ ToggleAtajosWindow() {
             WinShow(atajosWindowId)
             WinActivate(atajosWindowId)
             isWindowVisible := true
+        }
+    }
+}
+
+; --------------------
+; Helpers de toggle genéricos
+; --------------------
+
+ToggleWindowByTitle(winTitle, runCommand) {
+    hwnd := WinExist(winTitle)
+    if (hwnd) {
+        if (WinActive("ahk_id " . hwnd)) {
+            WinMinimize(hwnd)
+            return
+        }
+        WinShow(hwnd)
+        WinRestore(hwnd)
+        WinActivate(hwnd)
+        return
+    }
+    if (runCommand != "") {
+        Run(runCommand)
+    }
+}
+
+ToggleWindowByExe(exeName, runCommand) {
+    hwnd := WinExist("ahk_exe " . exeName)
+    if (hwnd) {
+        if (WinActive("ahk_id " . hwnd)) {
+            WinMinimize(hwnd)
+            return
+        }
+        WinShow(hwnd)
+        WinRestore(hwnd)
+        WinActivate(hwnd)
+        return
+    }
+    if (runCommand != "") {
+        Run(runCommand)
+    }
+}
+
+TogglePWA(pwaId, pwaName) {
+    ; Buscar ventana por título de la PWA
+    hwnd := WinExist(pwaName)
+    
+    ; Si no se encuentra por título, buscar por clase de ventana de Edge
+    if (hwnd == 0) {
+        hwnd := WinExist("ahk_class Chrome_WidgetWin_1")
+        ; Verificar si es la ventana correcta buscando en el título
+        if (hwnd != 0) {
+            currentTitle := WinGetTitle(hwnd)
+            if (!InStr(currentTitle, pwaName)) {
+                hwnd := 0
+            }
+        }
+    }
+    
+    if (hwnd) {
+        if (WinActive("ahk_id " . hwnd)) {
+            WinMinimize(hwnd)
+            return
+        }
+        WinShow(hwnd)
+        WinRestore(hwnd)
+        WinActivate(hwnd)
+        return
+    }
+    
+    ; Si no se encuentra, abrir la PWA
+    edgePath := "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+    if (!FileExist(edgePath)) {
+        edgePath := "C:\Program Files\Microsoft\Edge\Application\msedge.exe"
+    }
+    
+    if (FileExist(edgePath)) {
+        if (pwaId != "") {
+            ; PWA con ID (app instalada)
+            Run(Chr(34) . edgePath . Chr(34) . " --app-id=" . pwaId)
+        } else {
+            ; PWA desde archivo HTML (como atajos_teclado.html)
+            if (pwaName == "Atajos") {
+                htmlPath := A_ScriptDir . "\atajos_teclado.html"
+                if (FileExist(htmlPath)) {
+                    Run(Chr(34) . edgePath . Chr(34) . " --app=" . Chr(34) . htmlPath . Chr(34))
+                }
+            }
         }
     }
 }
@@ -80,74 +178,75 @@ FindAtajosWindow() {
     return (atajosWindowId != 0)
 }
 
-OpenAtajosPWA() {
-    ; Ruta al archivo HTML
-    htmlPath := A_ScriptDir . "\atajos_teclado.html"
-    
-    ; Verificar si el archivo existe
-    if (!FileExist(htmlPath)) {
-        return
-    }
-    
-    ; Abrir con Edge en modo aplicación
-    edgePath := "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
-    if (!FileExist(edgePath)) {
-        edgePath := "C:\Program Files\Microsoft\Edge\Application\msedge.exe"
-    }
-    
-    if (FileExist(edgePath)) {
-        ; Abrir como PWA
-        Run(Chr(34) . edgePath . Chr(34) . " --app=" . Chr(34) . htmlPath . Chr(34))
-    } else {
-        ; Fallback: abrir con navegador por defecto
-        Run(htmlPath)
-    }
-}
-
-OpenEdgeApp() {
-    ; Abrir la aplicación de Edge específica
-    ; ID: hambcbdmoijfllbddakfglefcahfejcl
-    edgePath := "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
-    if (!FileExist(edgePath)) {
-        edgePath := "C:\Program Files\Microsoft\Edge\Application\msedge.exe"
-    }
-    
-    if (FileExist(edgePath)) {
-        ; Abrir aplicación específica de Edge
-        Run(Chr(34) . edgePath . Chr(34) . " --app-id=hambcbdmoijfllbddakfglefcahfejcl")
-    }
-}
 
 
 
 ; ========================================
-; ATAJOS CON COMPORTAMIENTO TIPO CHATGPT
+; ATAJOS A SUS DESTINOS CORRECTOS
 ; ========================================
-; Todos los atajos ahora muestran/ocultan la ventana de atajos
+; Usando las URLs/ comandos que dejaste en comentarios
 
-^!1::ToggleAtajosWindow()
-^!2::ToggleAtajosWindow()
-#!j::ToggleAtajosWindow()
-^!v::ToggleAtajosWindow()
+^!1::Run("https://www.google.com/")
+^!2::Run("https://www.youtube.com")
+#!j::Run("https://python.langchain.com/docs")
+^!v::Run("https://www.chatgpt.com")
 
-^!w::ToggleAtajosWindow()
-^!e::ToggleAtajosWindow()
-^!r::ToggleAtajosWindow()
-^!t::ToggleAtajosWindow()
-^!y::ToggleAtajosWindow()
-^!u::ToggleAtajosWindow()
-^!i::ToggleAtajosWindow()
-^!o::ToggleAtajosWindow()
-^!p::ToggleAtajosWindow()
-^!s::ToggleAtajosWindow()
-^!a::ToggleAtajosWindow()
-^!d::ToggleAtajosWindow()
-^!f::ToggleAtajosWindow()
-^!g::ToggleAtajosWindow()
+^!w::Run("https://www.aigoogle.studio.com")
+^!e::Run("https://www.explainshell.com")
+^!r::Run("https://www.reddit.com")
+^!t::Run("https://www.tiktok.com")
+^!y::Run("https://www.youtube.com")
+^!u::Run("https://www.twitter.com")
+^!i::Run("https://www.instagram.com")
+^!o::Run("https://www.linkedin.com")
+^!p::Run("https://www.pinterest.com")
+^!s::Run("https://www.stackoverflow.com")
+^!a::Run("https://www.amazon.com")
+^!d::Run("https://www.dev.to")
+^!f::Run("https://www.facebook.com")
+^!g::Run("https://www.github.com")
 
-#j::ToggleAtajosWindow()
-^!c::ToggleAtajosWindow()
-^!j::ToggleAtajosWindow()
+; Apps con comportamiento toggle (mismo atajo minimiza/restaura)
+#j::ToggleWindowByTitle("Warp", '"C:\\Users\\J.J. R\\AppData\\Local\\Programs\\Warp\\warp.exe"')
+^!c::ToggleWindowByExe("chrome.exe", '"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" "https://www.chatgpt.com"')
+^!j::ToggleWindowByExe("Cursor.exe", '"C:\\Users\\J.J. R\\AppData\\Local\\Programs\\cursor\\Cursor.exe" "C:\\Users\\J.J. R\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup"')
+
+
+#Requires AutoHotkey v2.0
+
+; Converted to AutoHotkey v1 (legacy) syntax to avoid #Warn about function-like commands
+; SetBatchLines is not needed in AHK v2 and has been removed.
+
+;^!1::Run("https://www.google.com/")
+;^!2::Run("https://www.youtube.com")
+;#!j::Run("https://python.langchain.com/docs")
+;^!v::Run("https://www.chatgpt.com")
+
+;^!w::Run("https://www.aigoogle.studio.com")
+;^!e::Run("https://www.explainshell.com")
+;^!r::Run("https://www.reddit.com")
+;^!t::Run("https://www.tiktok.com")
+;^!y::Run("https://www.youtube.com")
+;^!u::Run("https://www.twitter.com")
+;^!i::Run("https://www.instagram.com")
+;^!o::Run("https://www.linkedin.com")
+;   ^!p::Run("https://www.pinterest.com")
+
+;^!d::Run("https://www.dev.to")
+;^!f::Run("https://www.facebook.com")
+;^!g::Run("https://www.github.com")
+
+;#j::Run("C:\Users\J.J. R\AppData\Local\Programs\Warp\warp.exe")
+;^!c::Run('"C:\Program Files\Google\Chrome\Application\chrome.exe" "https://www.chatgpt.com"')
+;^!j:: {
+;	exe := 'C:\Users\J.J. R\AppData\Local\Programs\cursor\Cursor.exe'
+;	arg := 'C:\Users\J.J. R\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup'
+;	Run(Chr(34) . exe . Chr(34) . ' ' . Chr(34) . arg . Chr(34))
+;}
+;! #Requires AutoHotkey v2.https://urbania.pe/inmueble/clasificado/alcllcin-alquiler-de-local-comercial-en-lince-lima-147057153https://urbania.pe/inmueble/clasificado/alcllcin-alquiler-de-local-comercial-en-lince-lima-147057153https://urbania.pe/inmueble/clasificado/alcllcin-alquiler-de-local-comercial-en-lince-lima-1470571530
+
+;#!r::Reload  ; recargar script con Ctrl+Win+R (más fiable)
+
 
 ; ========================================
 ; ATAJOS DE SISTEMA
