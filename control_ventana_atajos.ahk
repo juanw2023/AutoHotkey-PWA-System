@@ -34,6 +34,7 @@ atajosProcessPath := ""
 
 ; PWA de xAI (tu app Edge)
 ^!#e::TogglePWA("hambcbdmoijfllbddakfglefcahfejcl", "xAI")
+^!#g::TogglePWA("bcmmjkglicliekcndffbfgcfopnidllp", "Google AI Studio")
 
 
 ; Ejemplos de más PWAs (descomenta y ajusta según necesites):
